@@ -1,0 +1,61 @@
+#!/bin/sh -e
+
+pwd
+#
+# S2I assemble script for the 's2i-ruby-alpine-mysql' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+# If the 's2i-ruby-alpine-mysql' assemble script is executed with the '-h' flag, print the usage.
+if [[ "$1" == "-h" ]]; then
+	exec /usr/libexec/s2i/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+#
+if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+  mv /tmp/artifacts/* ./
+fi
+
+set -e
+
+export RACK_ENV=${RACK_ENV:-"production"}
+
+if [ -n "$RUBYGEM_MIRROR" ]; then
+  bundle config mirror.https://rubygems.org $RUBYGEM_MIRROR
+fi
+
+echo "---> Installing application source ..."
+cp -Rf /tmp/src/. ./
+
+echo "---> Building your Ruby application from source ..."
+bundle install --path ./bundle
+
+# if [ -f Gemfile ]; then
+#   ADDTL_BUNDLE_ARGS="--retry 2"
+#   if [ -f Gemfile.lock ]; then
+#     ADDTL_BUNDLE_ARGS+=" --deployment"
+#   fi
+#
+#   if [[ "$RAILS_ENV" == "development" || "$RACK_ENV" == "development" ]]; then
+#     BUNDLE_WITHOUT=${BUNDLE_WITHOUT:-"test"}
+#   elif [[ "$RAILS_ENV" == "test" || "$RACK_ENV" == "test" ]]; then
+#     BUNDLE_WITHOUT=${BUNDLE_WITHOUT:-"development"}
+#   else
+#     BUNDLE_WITHOUT=${BUNDLE_WITHOUT:-"development:test"}
+#   fi
+#
+#   if [ -n "$BUNDLE_WITHOUT" ]; then
+#     ADDTL_BUNDLE_ARGS+=" --without $BUNDLE_WITHOUT"
+#   fi
+#
+#   echo "---> Running 'bundle install --path ./bundle ${ADDTL_BUNDLE_ARGS}' ..."
+#   bundle install --path ./bundle ${ADDTL_BUNDLE_ARGS}
+#
+#   echo "---> Cleaning up unused ruby gems ..."
+#   bundle clean -V
+# fi
