@@ -1,15 +1,17 @@
 FROM ruby:2.4-alpine
 
-RUN apk add --update --no-cache --virtual build-deps build-base python git bash && \
-    gem install libv8 -v 3.16.14.16 && \
-    apk del build-deps
+# RUN apk add --update --no-cache --virtual build-deps build-base python git bash && \
+#     gem install libv8 -v 3.16.14.16 && \
+#     apk del build-deps
 
 RUN apk --update add \
     bash \
     build-base \
     mariadb-dev \
     libxml2-dev libxslt-dev \
+    nodejs \
     git \
+    tzdata \
     && rm -rf /var/lib/apt/lists/* \
     && rm /var/cache/apk/*
 
@@ -44,6 +46,7 @@ COPY ./root/ /
 # pg: postgresql-dev
 # mysql: mariadb-dev
 # nokogiri: libxml2-dev libxslt-dev:w
+# tzdata: tzdata
 # github gems: git
 
 RUN bundle config build.nokogiri --use-system-libraries

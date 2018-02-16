@@ -3,8 +3,9 @@
 ## Usage
 ```
 make build
+make publish
 
-s2i build . s2i-ruby-alpine-mysql bla
-s2i build --rm --incremental=true --env=RAILS_ENV=test . s2i-ruby-alpine-mysql bla
+s2i build . kimat/s2i-ruby-alpine-mysql bla
+s2i build --rm --incremental=true --env=RAILS_ENV=test . kimat/s2i-ruby-alpine-mysql bla
 ```
 
